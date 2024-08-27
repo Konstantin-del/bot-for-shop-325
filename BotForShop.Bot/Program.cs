@@ -8,11 +8,11 @@ namespace BotForShop.Bot
 {
     public class Program
     {
-        static string token = Environment.GetEnvironmentVariable("Gram");
+        static string token = Environment.GetEnvironmentVariable("Gram");// достаём токен телеги из переменной окружения
         //public static UserService UserService { get; set; }
         static void Main(string[] args)
         {
-            ITelegramBotClient bot = new TelegramBotClient(token);
+            ITelegramBotClient bot = new TelegramBotClient(token);// можно временно добавить токен сюда ток не пушить с ним
 
             var cts = new CancellationTokenSource();
             var cancellationToken = cts.Token;
@@ -56,9 +56,9 @@ namespace BotForShop.Bot
 
                     var userService = new UserService();
 
-                    //userService.AddUser(user);
+                    //userService.AddUser(user); // добавляем юзера в тестовую таблицу
 
-                    var users = userService.GetAllUsers();
+                    var users = userService.GetAllUsers(); // извлекаем юзеров из тестовой таблицы
 
 
                     string mess = "";
@@ -71,7 +71,7 @@ namespace BotForShop.Bot
                 }
                 else
                 {
-                    await botClient.SendTextMessageAsync(message.Chat, $"you entered - {message.Text}");
+                    await botClient.SendTextMessageAsync(message.Chat, $"you entered - {message.Text}");// отправляем юзеров в телегу
                 }
             }
         }
