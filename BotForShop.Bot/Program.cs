@@ -3,13 +3,14 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
 using BotForShop.BLL;
+using BotForShop.DAL;
 
 namespace BotForShop.Bot
 {
     public class Program
     {
         static string token = Environment.GetEnvironmentVariable("Gram");// достаём токен телеги из переменной окружения
-        //public static UserService UserService { get; set; }
+        public static UserService UserService { get; set; }
         static void Main(string[] args)
         {
             ITelegramBotClient bot = new TelegramBotClient(token);// можно временно добавить токен сюда ток не пушить с ним

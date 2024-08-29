@@ -3,10 +3,6 @@ using Dapper;
 using BotForShop.DAL.Queries;
 using BotForShop.Core.Dtos;
 using BotForShop.Core;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BotForShop.DAL
 {
@@ -34,11 +30,6 @@ namespace BotForShop.DAL
 
                 connection.Open();
                 var arr = connection.Query<UserDto>(query).ToList();
-
-                foreach (var item in arr)
-                {
-                    Console.WriteLine(item.Name);
-                }
                 return arr;
             }
         }

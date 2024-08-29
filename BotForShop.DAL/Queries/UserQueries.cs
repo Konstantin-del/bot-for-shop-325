@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BotForShop.DAL.Queries
 {
-    internal class UserQueries
+    public class UserQueries
     {
         public const string AddUserQuerie = $"INSERT INTO \"UserTest\"(\"Name\") VALUES (@name);";
 
