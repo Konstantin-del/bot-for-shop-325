@@ -16,7 +16,7 @@ namespace BotForShop.Bot.state
         {
             var userService = new UserService();
 
-            var users = userService.GetAllUsers(); // извлекаем юзеров из тестовой таблицы
+            var users = userService.GetAllUsers(); 
 
             string mess = "";
 

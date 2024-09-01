@@ -12,15 +12,15 @@ namespace BotForShop.Bot
     public class Context
     {
         public long ChatId;
-        public AbstractState state { get; set; }
+        public AbstractState State { get; set; }
 
-        public void HandleMessage(Update update)
+        public void HandleMessageContext(Update update)
         {
-            state.HandleMessage(this, update);
+            State.HandleMessage(this, update);
         }
-        public void BotAction(Update update, ITelegramBotClient botClient)
+        public void BotActionContext(Update update, ITelegramBotClient botClient)
         {
-            state.BotAction(this, update, botClient);
+            State.BotAction(this, update, botClient);
         }
         
     }

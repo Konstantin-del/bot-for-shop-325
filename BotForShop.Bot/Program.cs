@@ -4,7 +4,8 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
 using BotForShop.BLL;
 using BotForShop.Core.Dtos;
-using BotForShop.Bot.States;
+using BotForShop.Bot.state;
+
 
 namespace BotForShop.Bot
 {
@@ -47,14 +48,23 @@ namespace BotForShop.Bot
             {
                 var message = update.Message;
 
-                Context context;
+                Context context = new Context();
 
-                if(message.Text != "1" || message.Text != "2")
+                if (message.Text != "1" && message.Text != "2")
                 {
-                    context = new Context();
-                    context.state = new StartMenuState();
-                    state.BotAction();
+
+                    context.State = new StartMenuState();
+                    context.BotActionContext(update, botClient);
                 }
+
+                else if (message.Text == "1")
+                {
+                    context.State = new ShowAllUser();
+                    context.BotActionContext(update, botClient);
+                }
+
+
+
 
 
                 //if (message.Text.ToLower() == "/start")
@@ -62,20 +72,20 @@ namespace BotForShop.Bot
    
                 //    await botClient.SendTextMessageAsync(message.Chat, $"Your name is {message.Chat.FirstName}");
                 //}
-                if (message.Text != null)
-                {
-                    var user = new UserInputModel()
-                    {
-                        Name = message.Text
-                    };
+                //if (message.Text != null)
+                //{
+                //    var user = new UserInputModel()
+                //    {
+                //        Name = message.Text
+                //    };
 
-                    Console.WriteLine(user.Name);
+                //    Console.WriteLine(user.Name);
 
-                    var userService = new UserService();
+                //    var userService = new UserService();
 
-                    userService.AddUser(user); // добавляем юзера в тестовую таблицу
+                //    userService.AddUser(user); // добавляем юзера в тестовую таблицу
      
-                }
+                //}
                 else
                 {
                     await botClient.SendTextMessageAsync(message.Chat, $"you entered - {message.Text}");// отправляем юзеров в телегу
