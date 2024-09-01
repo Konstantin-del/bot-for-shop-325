@@ -3,17 +3,24 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
 using BotForShop.BLL;
-using BotForShop.DAL;
+using BotForShop.Core.Dtos;
 
 namespace BotForShop.Bot
 {
     public class Program
     {
-        static string token = Environment.GetEnvironmentVariable("Gram");// достаём токен телеги из переменной окружения
+
+        public List<UserDto> Users;
+
+        static string token = Environment.GetEnvironmentVariable("Gram");
         public static UserService UserService { get; set; }
         static void Main(string[] args)
         {
-            ITelegramBotClient bot = new TelegramBotClient(token);// можно временно добавить токен сюда ток не пушить с ним
+
+            var userService = new UserService();
+            var h = userService.GetAllOrderWith();
+
+            ITelegramBotClient bot = new TelegramBotClient(token);
 
             var cts = new CancellationTokenSource();
             var cancellationToken = cts.Token;
@@ -42,8 +49,17 @@ namespace BotForShop.Bot
             {
                 var message = update.Message;
 
+                string text =
+                    "enter namber \n" +
+                    "add user: 1 \n" +
+                    "get one user: 2 \n" +
+                    "get all users: 3 \n";
+
+                await botClient.SendTextMessageAsync(message.Chat, text);
+
                 if (message.Text.ToLower() == "/start")
                 {
+   
                     await botClient.SendTextMessageAsync(message.Chat, $"Your name is {message.Chat.FirstName}");
                 }
                 else if (message.Text != null)
@@ -55,20 +71,20 @@ namespace BotForShop.Bot
 
                     //Console.WriteLine(user.Name);
 
-                    var userService = new UserService();
+                    //var userService = new UserService();
 
                     //userService.AddUser(user); // добавляем юзера в тестовую таблицу
 
-                    var users = userService.GetAllUsers(); // извлекаем юзеров из тестовой таблицы
+                    //var users = userService.GetAllUsers(); // извлекаем юзеров из тестовой таблицы
 
 
-                    string mess = "";
+                    //string mess = "";
 
-                    foreach (var item in users)
-                    {
-                        mess += $"{item.Name} \n";
-                    }
-                    await botClient.SendTextMessageAsync(message.Chat, mess);
+                    //foreach (var item in users)
+                    //{
+                    //    mess += $"{item.Name} \n";
+                    //}
+                    //await botClient.SendTextMessageAsync(message.Chat, mess);
                 }
                 else
                 {

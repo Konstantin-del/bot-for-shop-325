@@ -13,16 +13,21 @@ namespace BotForShop.BLL
     {
         public UserRepository UserRepository { get; set; }
 
+        public OrderRepository OrderRepository { get; set; }
+
         private Mapper _mapper;
 
         public UserService()
         {
             UserRepository = new UserRepository();
+            OrderRepository = new OrderRepository();
 
             var config = new MapperConfiguration(
             cfg =>
             {
                 cfg.AddProfile(new UserMapperProfile());
+                cfg.AddProfile(new OrderMapperProfile());
+                cfg.AddProfile(new ProductMapperProfile());
             });
             _mapper = new Mapper(config);
         }
@@ -41,6 +46,13 @@ namespace BotForShop.BLL
             var users = UserRepository.GetAllUsers();
             var usersOutput = _mapper.Map<List<UserOutputModel>>(users);
             return usersOutput;
+        }
+
+        public List<OrderOutputModel> GetAllOrderWith()
+        {
+            List<OrderDto> userDtos = OrderRepository.GetAllOrderWithProduct();
+            List<OrderOutputModel> users = _mapper.Map<List<OrderOutputModel>>(userDtos);
+            return users;
         }
 
 

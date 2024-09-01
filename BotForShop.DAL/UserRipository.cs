@@ -33,5 +33,7 @@ namespace BotForShop.DAL
                 return arr;
             }
         }
+
+        
     }
 }

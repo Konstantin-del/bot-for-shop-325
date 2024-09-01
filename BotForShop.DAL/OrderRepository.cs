@@ -24,5 +24,56 @@ namespace BotForShop.DAL
                 return items;
             }
         }
+
+        public List<OrderDto> GetAllOrderWithProduct()
+        {
+            string conectionString = Options.ConectionString;
+            using (var connection = new NpgsqlConnection(conectionString))
+            {
+                string query = OrderQueries.GetAllOrderWithProductQuery;
+
+                connection.Open();
+                var result = new List<OrderDto>();
+
+                connection.Query<OrderDto, ProductDto, OrderDto>(query,
+                    (order, product) =>
+                    {
+                        int i = 0;
+                        bool isFouded = false;
+                        foreach (var u in result)
+                        {
+                            if (u.Id == order.Id)
+                            {
+                                isFouded = true;
+                                break;
+                            }
+                            i++;
+                        }
+
+                        OrderDto crtnOrder;
+                        if (isFouded)
+                        {
+                            crtnOrder = result[i];
+                        }
+                        else
+                        {
+                            crtnOrder = order;
+                            crtnOrder.Products = new List<ProductDto>();
+                            result.Add(crtnOrder);
+                        }
+
+                        if (product is null)
+                        {
+                            return order;
+                        }
+
+                        crtnOrder.Products.Add(product);
+
+                        return order;
+                    }, splitOn: "Id");
+
+                return result;
+            }
+        }
     }
 }

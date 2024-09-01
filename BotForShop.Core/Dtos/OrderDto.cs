@@ -13,6 +13,8 @@ namespace BotForShop.Core.Dtos
         public string? ProductName { get; set; }
 
         public int? Count { get; set; }
+
+        public List<ProductDto>? Products { get; set; }
     }
 }
 
