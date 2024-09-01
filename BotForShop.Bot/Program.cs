@@ -4,6 +4,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
 using BotForShop.BLL;
 using BotForShop.Core.Dtos;
+using BotForShop.Bot.States;
 
 namespace BotForShop.Bot
 {
@@ -13,12 +14,9 @@ namespace BotForShop.Bot
         public List<UserDto> Users;
 
         static string token = Environment.GetEnvironmentVariable("Gram");
-        public static UserService UserService { get; set; }
+        
         static void Main(string[] args)
         {
-
-            var userService = new UserService();
-            var h = userService.GetAllOrderWith();
 
             ITelegramBotClient bot = new TelegramBotClient(token);
 
@@ -49,42 +47,34 @@ namespace BotForShop.Bot
             {
                 var message = update.Message;
 
-                string text =
-                    "enter namber \n" +
-                    "add user: 1 \n" +
-                    "get one user: 2 \n" +
-                    "get all users: 3 \n";
+                Context context;
 
-                await botClient.SendTextMessageAsync(message.Chat, text);
-
-                if (message.Text.ToLower() == "/start")
+                if(message.Text != "1" || message.Text != "2")
                 {
-   
-                    await botClient.SendTextMessageAsync(message.Chat, $"Your name is {message.Chat.FirstName}");
+                    context = new Context();
+                    context.state = new StartMenuState();
+                    state.BotAction();
                 }
-                else if (message.Text != null)
+
+
+                //if (message.Text.ToLower() == "/start")
+                //{
+   
+                //    await botClient.SendTextMessageAsync(message.Chat, $"Your name is {message.Chat.FirstName}");
+                //}
+                if (message.Text != null)
                 {
-                    //var user = new UserInputModel()
-                    //{
-                    //    Name = message.Text
-                    //};
+                    var user = new UserInputModel()
+                    {
+                        Name = message.Text
+                    };
 
-                    //Console.WriteLine(user.Name);
+                    Console.WriteLine(user.Name);
 
-                    //var userService = new UserService();
+                    var userService = new UserService();
 
-                    //userService.AddUser(user); // добавляем юзера в тестовую таблицу
-
-                    //var users = userService.GetAllUsers(); // извлекаем юзеров из тестовой таблицы
-
-
-                    //string mess = "";
-
-                    //foreach (var item in users)
-                    //{
-                    //    mess += $"{item.Name} \n";
-                    //}
-                    //await botClient.SendTextMessageAsync(message.Chat, mess);
+                    userService.AddUser(user); // добавляем юзера в тестовую таблицу
+     
                 }
                 else
                 {
