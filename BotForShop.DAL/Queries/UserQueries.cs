@@ -20,5 +20,20 @@ namespace BotForShop.DAL.Queries
             $" left join \"Order\" as O on O.\"ClientId\"=U.\"Id\"" +
             $" left join \"OrderProducts\" as OP on OP.\"OrderId\"=O.\"Id\"" +
             $" left join \"Product\" as P on P.\"Id\"=OP.\"ProductId\"";
+
+        public const string GetUsersForAuthentication =
+            $"select U.\"ChatId\", UR.\"UserRole\"" +
+            $" from \"User\" as U" +
+            $" left join \"UserRole\" as UR on UR.\"Id\"=U.\"RoleId\"";
+
+        public const string GetUserForAuthentication = $"SELECT U.\"Name\", U.\"ShatId\", UR.\"UserRole\""+
+            $" FROM \"Users\" as U "+
+            $" JOIN \"UserRoles\" as UR "+
+            $" ON U.\"RoleId\"=UR.\"Id\"";
+
+        public const string GetUserRole = $"SELECT * FROM \"UserRoles\"";
+
+        public const string GetUserShop = $"SELECT \"Shops\".\"Id\"," +
+            $" \"Shops\".\"ShopAddress\" FROM \"Shops\"";
     }
 }
