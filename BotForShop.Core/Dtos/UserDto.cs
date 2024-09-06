@@ -8,17 +8,19 @@ namespace BotForShop.Core.Dtos
 {
     public class UserDto
     {
-        public int? Id { get; set; }
-
-        public long? ChatId { get; set; }
-
-        public string? UserRole { get; set; }
+        public string? UserName { get; set; }
 
         public string? Phone { get; set; }
 
-        public string? Name { get; set; }
+        public int? RoleId { get; set; }
 
         public int? ShopId { get; set; }
+
+        public long? ChatId { get; set; }
+
+        public int? Id { get; set; }
+
+        public string? UserRole { get; set; }
 
         public string? ShopAddress { get; set; }
 

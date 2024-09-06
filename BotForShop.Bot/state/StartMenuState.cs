@@ -25,9 +25,13 @@ namespace BotForShop.Bot.state
             }
             else if (update.Message.Text.ToLower() == "325")
             {
-                context.UserRole = "325";
+                context.RoleId = 325;
                 context.State = new StartMenuAdminState();
                 context.BotActionContext(update, botClient);
+            }
+            else 
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat, "Hello");
             }
         }
 

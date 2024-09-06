@@ -13,7 +13,7 @@ namespace BotForShop.Bot
 
         public string? NicName { get; set; }
 
-        public string? UserRole { get; set; }
+        public int? RoleId { get; set; }
 
         public AbstractState State { get; set; }
 

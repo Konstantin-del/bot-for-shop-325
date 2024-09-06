@@ -34,9 +34,7 @@ namespace BotForShop.BLL
 
         public void AddUser(UserInputModel user)
         {
-            Console.WriteLine("coming");
             var userDto = _mapper.Map<UserDto>(user);
-
             UserRepository.AddUser(userDto);
         }
 

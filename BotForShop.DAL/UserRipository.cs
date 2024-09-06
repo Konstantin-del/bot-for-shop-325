@@ -15,9 +15,9 @@ namespace BotForShop.DAL
             {
                 string query = UserQueries.AddUserQuerie;
                 var args = new { 
-                    name = user.Name,
+                    name = user.UserName,
                     phone = user.Phone, 
-                    roleId = user.UserRole,
+                    roleId = user.RoleId,
                     shopId = user.ShopId,
                     chatId = user.ChatId
                 };
@@ -32,7 +32,7 @@ namespace BotForShop.DAL
             string conectionString = Options.ConectionString;
             using (var connection = new NpgsqlConnection(conectionString))
             {
-                string query = UserQueries.GetUserRole;
+                string query = UserQueries.GetUserRoleQuery;
                 
                 connection.Open();
                 var arr = connection.Query<UserDto>(query).ToList();
@@ -45,7 +45,7 @@ namespace BotForShop.DAL
             string conectionString = Options.ConectionString;
             using (var connection = new NpgsqlConnection(conectionString))
             {
-                string query = UserQueries.GetUserShop;
+                string query = UserQueries.GetUserShopQuery;
 
                 connection.Open();
                 var arr = connection.Query<UserDto>(query).ToList();
@@ -58,7 +58,7 @@ namespace BotForShop.DAL
             string conectionString = Options.ConectionString;
             using (var connection = new NpgsqlConnection(conectionString))
             {
-                string query = UserQueries.GetUserForAuthentication;
+                string query = UserQueries.GetUserForAuthenticationQuery;
 
                 connection.Open();
                 var arr = connection.Query<UserDto>(query).ToList();

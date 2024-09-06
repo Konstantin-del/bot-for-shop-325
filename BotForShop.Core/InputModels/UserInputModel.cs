@@ -8,13 +8,13 @@ namespace BotForShop.Core.InputModels
 {
     public class UserInputModel
     {
-        public string Name { get; set; }
+        public string UserName { get; set; }
 
         public string Phone { get; set; }
 
         public int RoleId { get; set; }
 
-        public int ShopeId { get; set; }
+        public int ShopId { get; set; }
 
         public long ChatId { get; set; }
     }

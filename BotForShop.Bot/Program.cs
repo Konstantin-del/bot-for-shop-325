@@ -22,6 +22,7 @@ namespace BotForShop.Bot
 
         static void Main(string[] args)
         {
+            Users = new Dictionary<long, Context>();
             try
             {
                 var userServis = new UserService();
@@ -30,16 +31,29 @@ namespace BotForShop.Bot
                 {
                     var userCurrent = new Context();
                     userCurrent.ChatId = item.ChatId;
-                    userCurrent.UserRole = item.UserRole;
-                    userCurrent.Name = item.Name;
-                    if (item.UserRole == "administrator") userCurrent.State = new StartMenuAdminState();
-                    Users.Add(item.ChatId, userCurrent);
+                    userCurrent.RoleId = item.RoleId;
+                    userCurrent.Name = item.UserName.ToLower();
+                    if (userCurrent.RoleId == 3)
+                    {
+                        userCurrent.State = new StartMenuAdminState();
+                        Console.WriteLine("gud");
+                    }
+                    else
+                    {
+                        userCurrent.State = new StartMenuState();
+                        Console.WriteLine("ups");
+                    }
+                    Users.Add(userCurrent.ChatId, userCurrent);
+                    Console.WriteLine(userCurrent.RoleId);
+                    Console.WriteLine(userCurrent.Name);
                 }
             }
             catch
             {
-                Users = new Dictionary<long, Context>();
+                Console.WriteLine("users not loaded from db");
             }
+            
+           
 
 
             ITelegramBotClient bot = new TelegramBotClient(token);
@@ -63,12 +77,7 @@ namespace BotForShop.Bot
 
             Console.ReadLine();
 
-        }
-
-        public static long GetChat(string name)
-        {
-             return  Users.Where(x => x.Value.Name == name).FirstOrDefault().Key;
-        }
+        } 
 
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
@@ -85,10 +94,8 @@ namespace BotForShop.Bot
                 else
                 {
                     userCurrent = new Context();
-                    userCurrent.Name = message.Chat.FirstName;
+                    userCurrent.Name = message.Chat.FirstName.ToLower();
                     userCurrent.ChatId = message.Chat.Id;
-                    Console.WriteLine(userCurrent.ChatId);
-                    //Console.WriteLine(userCurrent.ChatId);
                     Users.Add(message.Chat.Id, userCurrent);
                     userCurrent.State = new StartMenuState(); 
                 }
@@ -96,7 +103,7 @@ namespace BotForShop.Bot
 
                 if (update.Message.Text == "1")
                 {
-                    bool isAdmin = userCurrent.UserRole == "administrator" || userCurrent.UserRole == "325";
+                    bool isAdmin = userCurrent.RoleId == 3 || userCurrent.RoleId == 325;
                     if (isAdmin)
                     {
                         userCurrent.State = new AddUserState();
@@ -112,30 +119,14 @@ namespace BotForShop.Bot
             Console.WriteLine(exception.ToString());
         }
 
+        public static long GetChatIdByName(string name)
+        {
+            return Users.Where(x => x.Value.Name == name.ToLower()).FirstOrDefault().Key;
+        }
+
         //if (userCurrent.State.GetType().ToString() == "AddUserState")
 
         //if (message.Text.ToLower() == "/start")
-        //{
-
-        //    await botClient.SendTextMessageAsync(message.Chat, $"Your name is {message.Chat.FirstName}");
-        //}
-        //if (message.Text != null)
-        //{
-        //    var user = new UserInputModel()
-        //    {
-        //        Name = message.Text
-        //    };
-
-        //    Console.WriteLine(user.Name);
-
-        //    var userService = new UserService();
-
-        //    userService.AddUser(user); // добавляем юзера в тестовую таблицу
-
-        //}
-        //else
-        //{
-        //    await botClient.SendTextMessageAsync(message.Chat, $"you entered - {message.Text}");// отправляем юзеров в телегу
-        //}
+       
     }
 }

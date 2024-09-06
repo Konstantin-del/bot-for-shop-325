@@ -8,7 +8,10 @@ namespace BotForShop.DAL.Queries
 {
     public class UserQueries
     {
-        public const string AddUserQuerie = $"INSERT INTO \"UserTest\"(\"Name\") VALUES (@name);";
+        public const string AddUserQuerie = 
+            $" INSERT INTO \"Users\""+
+            $" (\"UserName\", \"Phone\", \"RoleId\", \"ShopId\", \"ChatId\")"+ 
+            $" VALUES (@name, @phone, @roleId, @shopId, @chatId)";
 
         public const string GetAllUsersQuery = $"SELECT * FROM \"UserTest\";";
 
@@ -21,19 +24,13 @@ namespace BotForShop.DAL.Queries
             $" left join \"OrderProducts\" as OP on OP.\"OrderId\"=O.\"Id\"" +
             $" left join \"Product\" as P on P.\"Id\"=OP.\"ProductId\"";
 
-        public const string GetUsersForAuthentication =
-            $"select U.\"ChatId\", UR.\"UserRole\"" +
-            $" from \"User\" as U" +
-            $" left join \"UserRole\" as UR on UR.\"Id\"=U.\"RoleId\"";
+        public const string GetUserForAuthenticationQuery =
+            $"SELECT u.\"UserName\", u.\"ChatId\", u.\"RoleId\"" +
+            $" FROM \"Users\" as u "; 
 
-        public const string GetUserForAuthentication = $"SELECT U.\"Name\", U.\"ShatId\", UR.\"UserRole\""+
-            $" FROM \"Users\" as U "+
-            $" JOIN \"UserRoles\" as UR "+
-            $" ON U.\"RoleId\"=UR.\"Id\"";
+        public const string GetUserRoleQuery = $"SELECT * FROM \"UserRoles\"";
 
-        public const string GetUserRole = $"SELECT * FROM \"UserRoles\"";
-
-        public const string GetUserShop = $"SELECT \"Shops\".\"Id\"," +
+        public const string GetUserShopQuery = $"SELECT \"Shops\".\"Id\"," +
             $" \"Shops\".\"ShopAddress\" FROM \"Shops\"";
     }
 }

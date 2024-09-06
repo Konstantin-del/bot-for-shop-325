@@ -9,7 +9,7 @@ namespace BotForShop.Core.OutputModels
      public class UsersAuthentication
     {
         public long ChatId { get; set; }
-        public string UserRole { get; set; }
-        public string Name { get; set; }
+        public int RoleId { get; set; }
+        public string UserName { get; set; }
     }
 }

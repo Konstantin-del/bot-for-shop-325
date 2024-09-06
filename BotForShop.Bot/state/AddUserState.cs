@@ -30,32 +30,33 @@ namespace BotForShop.Bot.state
                         break;
 
                     case "1":
-                        var chatId = Program.GetChat(value);
+                        var chatId = Program.GetChatIdByName(value);
                         if (chatId != 0)
                         {
                             User.ChatId = chatId;
-
-                            HandleAnswer(update, botClient, $"chatid-{chatId} added \n" + 
-                            ShowIdRolesAndShops() + "enter name");
-
+                            HandleAnswer(
+                                update, botClient, $"chatid-{chatId} added \n" + 
+                                ShowIdRolesAndShops() +"\n"+"Enter name"
+                                );
                             HandleAnswerNumber = "2";
                         }
                         else
                         {
-                            HandleAnswer(update, botClient, "error");
+                            HandleAnswer(update, botClient, "no such name");
                             context.State = new StartMenuAdminState();
                             context.BotActionContext(update, botClient);
+                            HandleAnswerNumber = "0";
                         }
                         break;
 
                     case "2":
-                        User.Name = value;
+                        User.UserName = value;
                         HandleAnswer(update, botClient, "enter phone");
                         HandleAnswerNumber = "3";
                         break;
 
                     case "3":
-                        User.Phone = value;
+                        User.Phone = value;;
                         HandleAnswer(update, botClient, "enter role id");
                         HandleAnswerNumber = "4";
                         break;
@@ -67,11 +68,21 @@ namespace BotForShop.Bot.state
                         break;
 
                     case "5":
-                        User.ShopeId = Convert.ToInt32(value);
-                        var userServis = new UserService();
-                        userServis.AddUser(User);
-                        HandleAnswer(update, botClient, "create user");
-                        context.State = new StartMenuAdminState();
+                        User.ShopId = Convert.ToInt32(value);
+                        try 
+                        {
+                            var userServis = new UserService();
+                            userServis.AddUser(User);
+                            HandleAnswer(update, botClient, "user added");
+                            context.State = new StartMenuAdminState();
+                            HandleAnswerNumber = "0";
+                            //context.BotActionContext(update, botClient);
+                        }
+                        catch 
+                        {
+                            HandleAnswer(update, botClient, "error");
+                            context.State = new StartMenuAdminState();
+                        }
                         break;
 
                     default:
@@ -110,5 +121,3 @@ namespace BotForShop.Bot.state
         
     }
 }
-
-// await botClient.SendTextMessageAsync(5926961743, "user registration");
