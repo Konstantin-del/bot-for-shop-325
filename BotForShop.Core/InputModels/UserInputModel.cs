@@ -10,5 +10,12 @@ namespace BotForShop.Core.InputModels
     {
         public string Name { get; set; }
 
+        public string Phone { get; set; }
+
+        public int RoleId { get; set; }
+
+        public int ShopeId { get; set; }
+
+        public long ChatId { get; set; }
     }
 }

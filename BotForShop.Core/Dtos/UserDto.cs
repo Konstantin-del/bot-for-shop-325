@@ -10,9 +10,15 @@ namespace BotForShop.Core.Dtos
     {
         public int? Id { get; set; }
 
+        public long? ChatId { get; set; }
+
+        public string? UserRole { get; set; }
+
+        public string? Phone { get; set; }
+
         public string? Name { get; set; }
 
-        public int? OrderCount { get; set; }
+        public int? ShopId { get; set; }
 
         public string? ShopAddress { get; set; }
 

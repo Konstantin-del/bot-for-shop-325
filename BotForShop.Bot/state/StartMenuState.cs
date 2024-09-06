@@ -2,35 +2,32 @@
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Npgsql.Replication.PgOutput.Messages;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BotForShop.Bot.state
 {
     public class StartMenuState : AbstractState
     {
-        public override void HandleMessage(Context context, Update update)
+        public override void HandleMessage(Context context, Update update, ITelegramBotClient botClient)
         {
-
+            
         }
 
-        bool isFirst = true;
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            if (update.Message.Text.ToLower() == "/start" && isFirst)
+
+
+            if (update.Message.Text.ToLower() == "/start")
             {
                 await botClient.SendTextMessageAsync(update.Message.Chat,
-                    "Hello, i'm Bot For Shop \n press any button to open the menu");
-                isFirst = false;
+                "Hello, i'm Bot For Shop \n send message to open the menu");
+              
             }
-
-            else
+            else if (update.Message.Text.ToLower() == "325")
             {
-                string text =
-
-                 "enter namber \n" +
-                 "add user: 1 \n" +
-                 "get one user: 2 \n";
-
-                await botClient.SendTextMessageAsync(update.Message.Chat, text);
+                context.UserRole = "325";
+                context.State = new StartMenuAdminState();
+                context.BotActionContext(update, botClient);
             }
         }
 

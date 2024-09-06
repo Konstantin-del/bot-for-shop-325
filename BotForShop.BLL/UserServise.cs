@@ -37,7 +37,7 @@ namespace BotForShop.BLL
             Console.WriteLine("coming");
             var userDto = _mapper.Map<UserDto>(user);
 
-            UserRepository.AddUser(userDto.Name);
+            UserRepository.AddUser(userDto);
         }
 
         public List<UserOutputModel> GetAllUsers()
@@ -48,14 +48,33 @@ namespace BotForShop.BLL
             return usersOutput;
         }
 
+        public List<UserRolesOutputModel> GetUserRole()
+        {
+            var arr = UserRepository.GetUserRoleId();
+            var userRoles = _mapper.Map<List<UserRolesOutputModel>>(arr);
+            return userRoles;
+        }
+
+        public List<UserGetShopAddressOutputModel> GetShopAddresses()
+        {
+            var arr = UserRepository.GetShopAddressId();
+            var shopAddresses = _mapper.Map<List<UserGetShopAddressOutputModel>>(arr);
+            return shopAddresses;
+        }
+
+        public List<UsersAuthentication> getUsersForAuthentication()
+        {
+            var arr = UserRepository.GetUsersForAuthentication();
+            var UsersChatId = _mapper.Map<List<UsersAuthentication>>(arr);
+            return UsersChatId;
+        }
+
         public List<OrderOutputModel> GetAllOrderWith()
         {
             List<OrderDto> userDtos = OrderRepository.GetAllOrderWithProduct();
             List<OrderOutputModel> users = _mapper.Map<List<OrderOutputModel>>(userDtos);
             return users;
         }
-
-
     }
 
 }
