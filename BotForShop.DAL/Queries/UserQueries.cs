@@ -11,7 +11,7 @@ namespace BotForShop.DAL.Queries
         public const string AddUserQuerie = 
             $" INSERT INTO \"Users\""+
             $" (\"UserName\", \"Phone\", \"RoleId\", \"ShopId\", \"ChatId\")"+ 
-            $" VALUES (@name, @phone, @roleId, @shopId, @chatId)";
+            $" VALUES (@name, @phone, @roleId, @shopId, @chatId) RETURNING \"Id\"";
 
         public const string GetAllUsersQuery = $"SELECT * FROM \"UserTest\";";
 
@@ -25,7 +25,7 @@ namespace BotForShop.DAL.Queries
             $" left join \"Product\" as P on P.\"Id\"=OP.\"ProductId\"";
 
         public const string GetUserForAuthenticationQuery =
-            $"SELECT u.\"UserName\", u.\"ChatId\", u.\"RoleId\"" +
+            $"SELECT u.\"Id\", u.\"UserName\", u.\"ChatId\", u.\"RoleId\"" +
             $" FROM \"Users\" as u "; 
 
         public const string GetUserRoleQuery = $"SELECT * FROM \"UserRoles\"";

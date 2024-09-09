@@ -15,12 +15,15 @@ namespace BotForShop.BLL
 
         public OrderRepository OrderRepository { get; set; }
 
+        public ProductRepository ProductRepository { get; set; }
+
         private Mapper _mapper;
 
         public UserService()
         {
             UserRepository = new UserRepository();
             OrderRepository = new OrderRepository();
+            ProductRepository = new ProductRepository();
 
             var config = new MapperConfiguration(
             cfg =>
@@ -32,10 +35,11 @@ namespace BotForShop.BLL
             _mapper = new Mapper(config);
         }
 
-        public void AddUser(UserInputModel user)
+        public int AddUser(UserInputModel user)
         {
             var userDto = _mapper.Map<UserDto>(user);
-            UserRepository.AddUser(userDto);
+            int userId = UserRepository.AddUser(userDto);
+            return userId;
         }
 
         public List<UserOutputModel> GetAllUsers()
@@ -55,24 +59,32 @@ namespace BotForShop.BLL
 
         public List<UserGetShopAddressOutputModel> GetShopAddresses()
         {
-            var arr = UserRepository.GetShopAddressId();
-            var shopAddresses = _mapper.Map<List<UserGetShopAddressOutputModel>>(arr);
+            var shopsAddressesDto = UserRepository.GetShopAddressId();
+            var shopAddresses = _mapper.Map<List<UserGetShopAddressOutputModel>>(shopsAddressesDto);
             return shopAddresses;
         }
 
-        public List<UsersAuthentication> getUsersForAuthentication()
+        public List<UsersAuthentication> GetUsersForAuthentication()
         {
-            var arr = UserRepository.GetUsersForAuthentication();
-            var UsersChatId = _mapper.Map<List<UsersAuthentication>>(arr);
+            var UsersChatIdDto = UserRepository.GetUsersForAuthentication();
+            var UsersChatId = _mapper.Map<List<UsersAuthentication>>(UsersChatIdDto);
             return UsersChatId;
         }
 
-        public List<OrderOutputModel> GetAllOrderWith()
+        //public List<OrderOutputModel> GetAllOrderWith()
+        //{
+        //    List<OrdersDto> ordersDto = OrderRepository.GetAllOrderWithProduct();
+        //    List<OrderOutputModel> users = _mapper.Map<List<OrderOutputModel>>(ordersDto);
+        //    return users;
+        //}
+
+        public List<ProductOutputModel> GetAllProducts()
         {
-            List<OrderDto> userDtos = OrderRepository.GetAllOrderWithProduct();
-            List<OrderOutputModel> users = _mapper.Map<List<OrderOutputModel>>(userDtos);
-            return users;
+            List<ProductDto> productsDto = ProductRepository.GetAllProducts();
+            List<ProductOutputModel> products = _mapper.Map<List<ProductOutputModel>>(productsDto);
+            return products;
         }
+
     }
 
 }

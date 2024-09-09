@@ -8,41 +8,45 @@ namespace BotForShop.Bot.state
 {
     public class AddUserState: AbstractState
     {
-        public static string HandleAnswerNumber = "0";
+        public string HandleAnswerNumber { get; set; } = "0";
         public UserInputModel User { get; set; } = new UserInputModel();
-        public override async void HandleMessage(Context context, Update update, ITelegramBotClient botClient)
-        {
-           
-        }
+
+        string value;
+
+        bool isString = false;
 
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            var value = update.Message.Text;
-            bool isString = string.IsNullOrEmpty(value);
+            if(HandleAnswerNumber != "0")
+            {
+                value = update.Message.Text;
+                isString = string.IsNullOrEmpty(value);
+            }
             
             if (!isString)
             {
                 switch (HandleAnswerNumber)
                 {
                     case "0":
-                        HandleAnswer(update, botClient, "What get chat id users, enter name");
+                        EditAnswer(context, update, botClient);
+                        SendAnswer(context, botClient, "To get chat id user, enter name");
                         HandleAnswerNumber = "1";
                         break;
 
                     case "1":
-                        var chatId = Program.GetChatIdByName(value);
+                        var chatId = UserProcessing.GetChatIdByName(value);
                         if (chatId != 0)
                         {
                             User.ChatId = chatId;
-                            HandleAnswer(
-                                update, botClient, $"chatid-{chatId} added \n" + 
+                            SendAnswer(
+                                context, botClient, $"chatid-{chatId} added \n" + 
                                 ShowIdRolesAndShops() +"\n"+"Enter name"
                                 );
                             HandleAnswerNumber = "2";
                         }
                         else
                         {
-                            HandleAnswer(update, botClient, "no such name");
+                            SendAnswer(context, botClient, "no such name");
                             context.State = new StartMenuAdminState();
                             context.BotActionContext(update, botClient);
                             HandleAnswerNumber = "0";
@@ -51,19 +55,19 @@ namespace BotForShop.Bot.state
 
                     case "2":
                         User.UserName = value;
-                        HandleAnswer(update, botClient, "enter phone");
+                        SendAnswer(context, botClient, "enter phone");
                         HandleAnswerNumber = "3";
                         break;
 
                     case "3":
                         User.Phone = value;;
-                        HandleAnswer(update, botClient, "enter role id");
+                        SendAnswer(context, botClient, "enter role id");
                         HandleAnswerNumber = "4";
                         break;
 
                     case "4":
                         User.RoleId = Convert.ToInt32(value);
-                        HandleAnswer(update, botClient, "enter shope id");
+                        SendAnswer(context, botClient, "enter shope id");
                         HandleAnswerNumber = "5";
                         break;
 
@@ -72,34 +76,42 @@ namespace BotForShop.Bot.state
                         try 
                         {
                             var userServis = new UserService();
-                            userServis.AddUser(User);
-                            HandleAnswer(update, botClient, "user added");
+                            int userId = userServis.AddUser(User);
+                            SendAnswer(context, botClient, "user added");
+                            context.Id = userId;
+                            UserProcessing.GetValuesForAuthentication(); // update users
                             context.State = new StartMenuAdminState();
                             HandleAnswerNumber = "0";
-                            //context.BotActionContext(update, botClient);
                         }
                         catch 
                         {
-                            HandleAnswer(update, botClient, "error");
+                            SendAnswer(context, botClient, "error adding user ");
                             context.State = new StartMenuAdminState();
                         }
                         break;
 
                     default:
-                        HandleAnswer(update, botClient, "error");
+                        SendAnswer(context, botClient, "error filing object");
                         HandleAnswerNumber = "1";
                         break;
                 }
             }
             else
             {
-                HandleAnswer(update, botClient, "the message is not correct");
+                SendAnswer(context, botClient, "the message is not correct");
                 HandleAnswerNumber = "1";
             }
         }
-        public async void HandleAnswer(Update update, ITelegramBotClient botClient, string text)
+        public async void SendAnswer(Context context, ITelegramBotClient botClient, string text)
         {
-            await botClient.SendTextMessageAsync(update.Message.Chat, $"{text}");
+            await botClient.SendTextMessageAsync(context.ChatId, $"{text}");
+        }
+
+        public async void EditAnswer(Context context, Update update, ITelegramBotClient botClient)
+        {
+            await botClient.EditMessageTextAsync(
+                context.ChatId, update.CallbackQuery.Message.MessageId,
+                "add user state", replyMarkup: context.keyboard);
         }
         public string ShowIdRolesAndShops()
         {
@@ -107,6 +119,7 @@ namespace BotForShop.Bot.state
             var roles = userService.GetUserRole();
             var addresses = userService.GetShopAddresses();
             string info = "";
+
             foreach (var item in roles)
             {
                 info += $"{item.Id}-{item.UserRole} \n";

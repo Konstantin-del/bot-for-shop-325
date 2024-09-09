@@ -2,6 +2,7 @@
 using BotForShop.Core.Dtos;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotForShop.Bot
 {
@@ -15,12 +16,12 @@ namespace BotForShop.Bot
 
         public int? RoleId { get; set; }
 
+        public int? Id { get; set; }
+
+        public InlineKeyboardMarkup? keyboard { get; set; }
+
         public AbstractState State { get; set; }
 
-        public void HandleMessageContext(Update update, ITelegramBotClient botClient)
-        {
-            State.HandleMessage(this, update, botClient);
-        }
         public void BotActionContext(Update update, ITelegramBotClient botClient)
         {
             State.BotAction(this, update, botClient);

@@ -3,12 +3,13 @@ using Dapper;
 using BotForShop.DAL.Queries;
 using BotForShop.Core.Dtos;
 using BotForShop.Core;
+using System.Collections;
 
 namespace BotForShop.DAL
 {
     public class UserRepository
     {
-        public void AddUser(UserDto user)
+        public int AddUser(UserDto user)
         {
             string conectionString = Options.ConectionString;
             using (var connection = new NpgsqlConnection(conectionString))
@@ -23,7 +24,10 @@ namespace BotForShop.DAL
                 };
 
                 connection.Open();
-                connection.Query(query, args);
+                var userId = connection.Query <UserDto> (query, args).First();
+                int id = Convert.ToInt32(userId.Id);
+                Console.WriteLine(id);
+                return id;
             }
         }
 

@@ -7,10 +7,6 @@ namespace BotForShop.Bot.state
 {
     public class ShowAllUser : AbstractState
     {
-        public override void HandleMessage(Context context, Update update, ITelegramBotClient botClient)
-        {
-
-        }
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
             var userService = new UserService();

@@ -14,7 +14,7 @@ namespace BotForShop.Core.Dtos
 
         public bool? IsActive;
 
-        public bool IsDelited;
+        public bool? IsDelited;
 
     }
 }
