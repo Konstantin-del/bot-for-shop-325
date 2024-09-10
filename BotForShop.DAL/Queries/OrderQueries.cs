@@ -8,6 +8,14 @@ namespace BotForShop.DAL.Queries
 {
     public class OrderQueries
     {
+        public const string AddOrder =
+            $" INSERT INTO \"Orders\" (\"CreatedDate\", \"StatusId\",\"AdminId\")" +
+            $" VALUES (@date, @statusId, @adminId) RETURNING \"Id\"";
+
+        public const string AddOrderProduct =
+            $" INSERT INTO \"OrderProducts\" (\"OrderId\",\"ProductId\", \"Count\")" +
+            $" VALUES (@orderId, @productId, @count)";
+
         public const string GetOrderByIdQuery = 
             $" SELECT \"Orders\".\"Id\", \"Products\".\"ProductName\", \"OrderProducts\".\"Count\"" +
             $" FROM \"Orders\" JOIN \"OrderProducts\" ON \"Orders\".\"Id\" = \"OrderProducts\".\"OrderId\" " +

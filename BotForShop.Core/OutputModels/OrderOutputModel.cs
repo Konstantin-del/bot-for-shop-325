@@ -10,6 +10,6 @@ namespace BotForShop.Core.OutputModels
     {
         public int Id { get; set; }
 
-        public List<ProductOutputModel> Products;
+        public List<ProductOutputModel>? Products { get; set; }
     }
 }

@@ -26,7 +26,6 @@ namespace BotForShop.DAL
                 connection.Open();
                 var userId = connection.Query <UserDto> (query, args).First();
                 int id = Convert.ToInt32(userId.Id);
-                Console.WriteLine(id);
                 return id;
             }
         }

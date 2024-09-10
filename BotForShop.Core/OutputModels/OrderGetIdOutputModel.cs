@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BotForShop.Core.Dtos
+namespace BotForShop.Core.OutputModels
 {
-    internal class OrderProductsDto
+    public class OrderGetIdOutputModel
     {
     }
 }

@@ -31,6 +31,7 @@ namespace BotForShop.BLL
                 cfg.AddProfile(new UserMapperProfile());
                 cfg.AddProfile(new OrderMapperProfile());
                 cfg.AddProfile(new ProductMapperProfile());
+                cfg.AddProfile(new OrderProductMapperProfile());
             });
             _mapper = new Mapper(config);
         }
@@ -44,7 +45,6 @@ namespace BotForShop.BLL
 
         public List<UserOutputModel> GetAllUsers()
         {
-
             var users = UserRepository.GetAllUsers();
             var usersOutput = _mapper.Map<List<UserOutputModel>>(users);
             return usersOutput;
@@ -71,18 +71,24 @@ namespace BotForShop.BLL
             return UsersChatId;
         }
 
-        //public List<OrderOutputModel> GetAllOrderWith()
-        //{
-        //    List<OrdersDto> ordersDto = OrderRepository.GetAllOrderWithProduct();
-        //    List<OrderOutputModel> users = _mapper.Map<List<OrderOutputModel>>(ordersDto);
-        //    return users;
-        //}
+        public int AddOrder(OrderInputModel order)
+        {
+            var orderDto = _mapper.Map<OrderDto>(order);
+            var orderId = OrderRepository.AddOrder(orderDto);
+            return orderId;
+        }
 
         public List<ProductOutputModel> GetAllProducts()
         {
             List<ProductDto> productsDto = ProductRepository.GetAllProducts();
             List<ProductOutputModel> products = _mapper.Map<List<ProductOutputModel>>(productsDto);
             return products;
+        }
+
+        public void AddOrderProduct(OrderProductInputModel orderProduct)
+        {
+            var orderDto = _mapper.Map<OrderDto>(orderProduct);
+            OrderRepository.AddOrderProduct(orderDto);   
         }
 
     }

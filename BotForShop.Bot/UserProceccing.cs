@@ -93,13 +93,18 @@ namespace BotForShop.Bot
             }
         }
 
+        public static void UpdateAdninToStartAdminState()
+        {
+            userCurrent.State = new StartMenuAdminState();
+        }
+
         public static void UpdateAdninToAddUserState() 
         {
             bool isAdmin = userCurrent.RoleId == 3 || userCurrent.RoleId == 325;
             if (isAdmin)
             {
                 userCurrent.State = new AddUserState();
-            }
+            }   
             else
             {
 

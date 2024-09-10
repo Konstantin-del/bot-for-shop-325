@@ -10,7 +10,15 @@ namespace BotForShop.Core.Dtos
     { 
         public int? Id { get; set; }
 
+        public DateTime? Date { get; set; }
+
+        public int? AdminId { get; set; }
+
         public string? ProductName { get; set; }
+
+        public int? OrderId { get; set; }
+
+        public int? ProductId { get; set; }
 
         public int? Count { get; set; }
 

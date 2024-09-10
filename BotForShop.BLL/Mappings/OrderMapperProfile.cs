@@ -10,6 +10,7 @@ namespace BotForShop.BLL.Mappings
         public OrderMapperProfile()
         {
             CreateMap<OrderDto, OrderOutputModel>();
+            CreateMap<OrderInputModel, OrderDto>();
         }
 
     }

@@ -3,6 +3,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using BotForShop.BLL;
 using System;
+using Telegram.Bot.Types.ReplyMarkups;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BotForShop.Bot.state
 {
@@ -10,6 +12,7 @@ namespace BotForShop.Bot.state
     {
         public string HandleAnswerNumber { get; set; } = "0";
         public UserInputModel User { get; set; } = new UserInputModel();
+        public static int CurrentMessageId { get; set; }
 
         string value;
 
@@ -17,7 +20,7 @@ namespace BotForShop.Bot.state
 
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            if(HandleAnswerNumber != "0")
+            if(HandleAnswerNumber != "0" && HandleAnswerNumber != "1")
             {
                 value = update.Message.Text;
                 isString = string.IsNullOrEmpty(value);
@@ -28,13 +31,31 @@ namespace BotForShop.Bot.state
                 switch (HandleAnswerNumber)
                 {
                     case "0":
-                        EditAnswer(context, update, botClient);
-                        SendAnswer(context, botClient, "To get chat id user, enter name");
-                        HandleAnswerNumber = "1";
+                        CurrentMessageId = update.CallbackQuery.Message.MessageId;
+                        await botClient.EditMessageTextAsync(
+                            context.ChatId, update.CallbackQuery.Message.MessageId,
+                            "create user", replyMarkup: keyboardIs);
+                            HandleAnswerNumber = "1";
                         break;
 
                     case "1":
-                        var chatId = UserProcessing.GetChatIdByName(value);
+                        if(update.CallbackQuery.Data == "yes")
+                        {
+                            
+                            EditAnswer(context, botClient, "To get chat id user, enter name");
+                            HandleAnswerNumber = "2";
+                        }
+                        else
+                        {
+                            EditAnswer(context, botClient, "redirect to admin menu");
+                            UserProcessing.UpdateAdninToStartAdminState();
+                            UserProcessing.userCurrent.BotActionContext(update, botClient);
+                            HandleAnswerNumber = "0";
+                        }
+                        break;
+
+                    case "2":
+                        var chatId = UserProcessing.GetChatIdByName(value);//here value is name  
                         if (chatId != 0)
                         {
                             User.ChatId = chatId;
@@ -42,36 +63,36 @@ namespace BotForShop.Bot.state
                                 context, botClient, $"chatid-{chatId} added \n" + 
                                 ShowIdRolesAndShops() +"\n"+"Enter name"
                                 );
-                            HandleAnswerNumber = "2";
+                            HandleAnswerNumber = "3";
                         }
                         else
                         {
-                            SendAnswer(context, botClient, "no such name");
-                            context.State = new StartMenuAdminState();
-                            context.BotActionContext(update, botClient);
+                            EditAnswer(context, botClient, "redirect to admin menu");
+                            UserProcessing.UpdateAdninToStartAdminState();
+                            UserProcessing.userCurrent.BotActionContext(update, botClient);
                             HandleAnswerNumber = "0";
                         }
                         break;
 
-                    case "2":
+                    case "3":
                         User.UserName = value;
                         SendAnswer(context, botClient, "enter phone");
-                        HandleAnswerNumber = "3";
-                        break;
-
-                    case "3":
-                        User.Phone = value;;
-                        SendAnswer(context, botClient, "enter role id");
                         HandleAnswerNumber = "4";
                         break;
 
                     case "4":
-                        User.RoleId = Convert.ToInt32(value);
-                        SendAnswer(context, botClient, "enter shope id");
+                        User.Phone = value;;
+                        SendAnswer(context, botClient, "enter role id");
                         HandleAnswerNumber = "5";
                         break;
 
                     case "5":
+                        User.RoleId = Convert.ToInt32(value);
+                        SendAnswer(context, botClient, "enter shope id");
+                        HandleAnswerNumber = "6";
+                        break;
+
+                    case "6":
                         User.ShopId = Convert.ToInt32(value);
                         try 
                         {
@@ -92,7 +113,7 @@ namespace BotForShop.Bot.state
 
                     default:
                         SendAnswer(context, botClient, "error filing object");
-                        HandleAnswerNumber = "1";
+                        HandleAnswerNumber = "2";
                         break;
                 }
             }
@@ -107,12 +128,14 @@ namespace BotForShop.Bot.state
             await botClient.SendTextMessageAsync(context.ChatId, $"{text}");
         }
 
-        public async void EditAnswer(Context context, Update update, ITelegramBotClient botClient)
+        public async void EditAnswer(Context context,
+            ITelegramBotClient botClient, string text)
         {
             await botClient.EditMessageTextAsync(
-                context.ChatId, update.CallbackQuery.Message.MessageId,
-                "add user state", replyMarkup: context.keyboard);
+                context.ChatId, CurrentMessageId,
+                text);
         }
+
         public string ShowIdRolesAndShops()
         {
             UserService userService = new UserService();
@@ -131,6 +154,20 @@ namespace BotForShop.Bot.state
             }
             return info;
         }
-        
+
+        InlineKeyboardMarkup keyboardIs = new InlineKeyboardMarkup(
+            new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("yes", "yes")
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("no", "no")
+                },
+            }
+        );
+
     }
 }

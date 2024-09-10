@@ -8,11 +8,11 @@ namespace BotForShop.Core.InputModels
 {
     public class OrderInputModel
     {
-        public int ProductId { get; set; }
+        //public int ProductId { get; set; }
 
-        public int Count { get; set; }
+        //public int Count { get; set; }
 
-        public int StatusId { get; set; }
+        //public int StatusId { get; set; }
 
         public int AdminId { get; set; }
 
