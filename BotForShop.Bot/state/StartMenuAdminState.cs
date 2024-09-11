@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 using static System.Net.Mime.MediaTypeNames;
+using Telegram.Bot.Types.Enums;
 
 namespace BotForShop.Bot.state
 {
@@ -14,9 +15,20 @@ namespace BotForShop.Bot.state
     {
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            context.keyboard = keyboard;
-            await botClient.SendTextMessageAsync(
-                context.ChatId, "select action", replyMarkup: keyboard);
+            if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery.Data != "end")
+            {
+                //context.keyboard = keyboard;
+                await botClient.EditMessageTextAsync(
+                    context.ChatId, update.CallbackQuery.Message.MessageId,
+                    "select action", replyMarkup: keyboard);
+            }
+            else
+            {
+                //context.keyboard = keyboard;
+                await botClient.SendTextMessageAsync(
+                    context.ChatId, "select action", replyMarkup: keyboard);
+            }
+                
 
         }
 

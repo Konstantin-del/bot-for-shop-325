@@ -5,6 +5,7 @@ using BotForShop.BLL;
 using System;
 using Telegram.Bot.Types.ReplyMarkups;
 using static System.Net.Mime.MediaTypeNames;
+using Telegram.Bot.Types.Enums;
 
 namespace BotForShop.Bot.state
 {
@@ -12,115 +13,153 @@ namespace BotForShop.Bot.state
     {
         public string HandleAnswerNumber { get; set; } = "0";
         public UserInputModel User { get; set; } = new UserInputModel();
-        public static int CurrentMessageId { get; set; }
+        public int CurrentMessageId { get; set; }
 
         string value;
 
         bool isString = false;
 
+        string currentMessage;
+
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            if(HandleAnswerNumber != "0" && HandleAnswerNumber != "1")
-            {
-                value = update.Message.Text;
-                isString = string.IsNullOrEmpty(value);
-            }
             
-            if (!isString)
+            //if(HandleAnswerNumber != "0" && HandleAnswerNumber != "1")
+            //{
+            //    value = update.Message.Text;
+            //    isString = string.IsNullOrEmpty(value);
+            //}
+
+            if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery.Data == "end")
             {
-                switch (HandleAnswerNumber)
-                {
-                    case "0":
-                        CurrentMessageId = update.CallbackQuery.Message.MessageId;
-                        await botClient.EditMessageTextAsync(
-                            context.ChatId, update.CallbackQuery.Message.MessageId,
-                            "create user", replyMarkup: keyboardIs);
-                            HandleAnswerNumber = "1";
-                        break;
-
-                    case "1":
-                        if(update.CallbackQuery.Data == "yes")
-                        {
-                            
-                            EditAnswer(context, botClient, "To get chat id user, enter name");
-                            HandleAnswerNumber = "2";
-                        }
-                        else
-                        {
-                            EditAnswer(context, botClient, "redirect to admin menu");
-                            UserProcessing.UpdateAdninToStartAdminState();
-                            UserProcessing.userCurrent.BotActionContext(update, botClient);
-                            HandleAnswerNumber = "0";
-                        }
-                        break;
-
-                    case "2":
-                        var chatId = UserProcessing.GetChatIdByName(value);//here value is name  
-                        if (chatId != 0)
-                        {
-                            User.ChatId = chatId;
-                            SendAnswer(
-                                context, botClient, $"chatid-{chatId} added \n" + 
-                                ShowIdRolesAndShops() +"\n"+"Enter name"
-                                );
-                            HandleAnswerNumber = "3";
-                        }
-                        else
-                        {
-                            EditAnswer(context, botClient, "redirect to admin menu");
-                            UserProcessing.UpdateAdninToStartAdminState();
-                            UserProcessing.userCurrent.BotActionContext(update, botClient);
-                            HandleAnswerNumber = "0";
-                        }
-                        break;
-
-                    case "3":
-                        User.UserName = value;
-                        SendAnswer(context, botClient, "enter phone");
-                        HandleAnswerNumber = "4";
-                        break;
-
-                    case "4":
-                        User.Phone = value;;
-                        SendAnswer(context, botClient, "enter role id");
-                        HandleAnswerNumber = "5";
-                        break;
-
-                    case "5":
-                        User.RoleId = Convert.ToInt32(value);
-                        SendAnswer(context, botClient, "enter shope id");
-                        HandleAnswerNumber = "6";
-                        break;
-
-                    case "6":
-                        User.ShopId = Convert.ToInt32(value);
-                        try 
-                        {
-                            var userServis = new UserService();
-                            int userId = userServis.AddUser(User);
-                            SendAnswer(context, botClient, "user added");
-                            context.Id = userId;
-                            UserProcessing.GetValuesForAuthentication(); // update users
-                            context.State = new StartMenuAdminState();
-                            HandleAnswerNumber = "0";
-                        }
-                        catch 
-                        {
-                            SendAnswer(context, botClient, "error adding user ");
-                            context.State = new StartMenuAdminState();
-                        }
-                        break;
-
-                    default:
-                        SendAnswer(context, botClient, "error filing object");
-                        HandleAnswerNumber = "2";
-                        break;
-                }
+                EditAnswer(context, botClient, "CANCEL");
+                UserProcessing.UpdateAdninToStartAdminState();
+                UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                HandleAnswerNumber = "0";
             }
             else
             {
-                SendAnswer(context, botClient, "the message is not correct");
-                HandleAnswerNumber = "1";
+                if (HandleAnswerNumber != "0" && HandleAnswerNumber != "1")
+                {
+                    value = update.Message.Text;
+                    isString = string.IsNullOrEmpty(value);
+                }
+
+
+
+                if (!isString)
+                {
+                    switch (HandleAnswerNumber)
+                    {
+                        case "0":
+                            CurrentMessageId = update.CallbackQuery.Message.MessageId;
+                            EditAnswerWithButton(context, botClient, "create user", keyboardYesNo);
+                            HandleAnswerNumber = "1";
+                            break;
+
+                        case "1":
+                            IsCallback(context, botClient, update);
+                            if (update.CallbackQuery.Data == "yes")
+                            {
+                                IsCallback(context, botClient, update);
+                                //EditAnswer(context, botClient, "To add chat id, enter user name");
+                                EditAnswerWithButton(
+                                    context, botClient,
+                                    "To add chat id, enter user name", keyboardCancel);
+                                HandleAnswerNumber = "2";
+                            }
+                            else
+                            {
+                                EditAnswer(context, botClient, "redirect to admin menu");
+                                UserProcessing.UpdateAdninToStartAdminState();
+                                UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                                HandleAnswerNumber = "0";
+                            }
+                            break;
+
+                        case "2":
+                            var chatId = 6655;// UserProcessing.GetChatIdByName(value); //here value is name  
+                            if (chatId != 0) // add check it user in db 
+                            {
+                                User.ChatId = chatId;
+                                User.UserName = value;
+
+                                currentMessage = $"chatid-{chatId} \n" +
+                                    $"name-{value} added \n" + ShowIdRolesAndShops();
+
+                                EditAnswerWithButton(
+                                    context, botClient,
+                                    currentMessage + "\n ENTER PHONE", keyboardCancel);
+                                //EditAnswer(context, botClient, currentMessage + "\n ENTER PHONE");
+                                HandleAnswerNumber = "3";
+                            }
+                            else
+                            {
+                                EditAnswer(context, botClient, "redirect to admin menu");
+                                UserProcessing.UpdateAdninToStartAdminState();
+                                UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                                HandleAnswerNumber = "0";
+                            }
+                            break;
+
+
+                        case "3":
+                            User.Phone = value;
+                            //EditAnswer(context, botClient, currentMessage + "\n ENTER ROLE ID");
+                            EditAnswerWithButton(
+                                   context, botClient,
+                              currentMessage + "\n ENTER ROLE ID", keyboardCancel);
+                            HandleAnswerNumber = "4";
+                            break;
+
+                        case "4":
+                            User.RoleId = Convert.ToInt32(value);
+                            //EditAnswer(context, botClient, currentMessage + "\n ENTER SHOP ID");
+                            EditAnswerWithButton(
+                                   context, botClient,
+                              currentMessage + "\n ENTER SHOP ID", keyboardCancel);
+                            HandleAnswerNumber = "5";
+                            break;
+
+                        case "5":
+                            User.ShopId = Convert.ToInt32(value);
+                            try
+                            {
+                                var userServis = new UserService();
+                                userServis.AddUser(User);
+                                EditAnswer(context, botClient, "USER ADDED");
+                                UserProcessing.GetValuesForAuthentication(); // update users
+                                context.State = new StartMenuAdminState();
+                                HandleAnswerNumber = "0";
+                            }
+                            catch
+                            {
+                                EditAnswer(context, botClient, "error adding user in db");
+                                Console.WriteLine("error adding user in db");
+                            }
+                            if (HandleAnswerNumber == "0")
+                            {
+                                UserProcessing.GetValuesForAuthentication(); // update users
+                            }
+                            UserProcessing.UpdateAdninToStartAdminState();
+                            UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                            break;
+
+                        default:
+                            EditAnswer(context, botClient, "error filing object");
+                            UserProcessing.UpdateAdninToStartAdminState();
+                            UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                            HandleAnswerNumber = "0";
+                            break;
+                    }
+                }
+                else
+                {
+                    SendAnswer(context, botClient, "the message is not correct");
+                    UserProcessing.UpdateAdninToStartAdminState();
+                    UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                    HandleAnswerNumber = "0";
+                }
             }
         }
         public async void SendAnswer(Context context, ITelegramBotClient botClient, string text)
@@ -134,6 +173,14 @@ namespace BotForShop.Bot.state
             await botClient.EditMessageTextAsync(
                 context.ChatId, CurrentMessageId,
                 text);
+        }
+
+        public async void EditAnswerWithButton(Context context,
+            ITelegramBotClient botClient, string text, InlineKeyboardMarkup keyboard)
+        {
+            await botClient.EditMessageTextAsync(
+                context.ChatId, CurrentMessageId,
+                text, replyMarkup: keyboard);
         }
 
         public string ShowIdRolesAndShops()
@@ -155,7 +202,19 @@ namespace BotForShop.Bot.state
             return info;
         }
 
-        InlineKeyboardMarkup keyboardIs = new InlineKeyboardMarkup(
+        public async void IsCallback(Context context, ITelegramBotClient botClient, Update update)
+        {
+            if (update.Type == UpdateType.Message)
+            {
+                await botClient.EditMessageTextAsync(
+                context.ChatId, CurrentMessageId,
+                "ERROR, button press expected");
+                UserProcessing.UpdateAdninToStartAdminState();
+                UserProcessing.UserCurrent.BotActionContext(update, botClient);
+            }
+        }
+
+        InlineKeyboardMarkup keyboardYesNo = new InlineKeyboardMarkup(
             new[]
             {
                 new[]
@@ -168,6 +227,25 @@ namespace BotForShop.Bot.state
                 },
             }
         );
+
+        InlineKeyboardMarkup keyboardCancel = new InlineKeyboardMarkup(
+            new[]
+            {
+                    InlineKeyboardButton.WithCallbackData("Cancel", "end")
+            }
+        );
+
+        //public async void IsMessage(Context context, ITelegramBotClient botClient, Update update)
+        //{
+        //    if(update.Type == UpdateType.CallbackQuery)
+        //    {
+        //        await botClient.EditMessageTextAsync(
+        //        context.ChatId, CurrentMessageId,
+        //        "ERROR, text was expected");
+        //        UserProcessing.UpdateAdninToStartAdminState();
+        //        UserProcessing.UserCurrent.BotActionContext(update, botClient);
+        //    }
+        //}
 
     }
 }

@@ -10,12 +10,13 @@ using BotForShop.BLL;
 using BotForShop.Core.InputModels;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Diagnostics.Metrics;
+using Telegram.Bot.Types.Enums;
 
 namespace BotForShop.Bot.state
 {
     public class AddOrderState :AbstractState
     {
-        int currentMessageId;
+        private int CurrentMessageId;
 
         string handleAnswerNumber = "0";
  
@@ -24,6 +25,10 @@ namespace BotForShop.Bot.state
         Update value;
 
         int orderId;
+
+        string listProducts;
+
+        //InlineKeyboardMarkup keyboardIs;
 
         OrderInputModel order = new OrderInputModel();
 
@@ -37,77 +42,94 @@ namespace BotForShop.Bot.state
             switch (handleAnswerNumber)
             {
                 case "0":
-                    currentMessageId = update.CallbackQuery.Message.MessageId;
-                    await botClient.EditMessageTextAsync(
-                    context.ChatId, currentMessageId,
-                    "create order", replyMarkup: keyboardIs);
-                    //EditAnswer(context, botClient, "create order", keyboardIs);
-
-                    
-
+                    CurrentMessageId = update.CallbackQuery.Message.MessageId;
+                    EditAnswerWithButton(context, botClient, "create order", keyboardIs);
                     handleAnswerNumber = "1";
-                    break;
+                break;
 
                 case "1":
                     if (update.CallbackQuery.Data == "yes")
                     {
-                        currentMessageId = update.CallbackQuery.Message.MessageId;
-                        EditAnswer(context, botClient, "create order");
                         order.Date = DateTime.Today;
                         order.AdminId = context.Id;
                         try
                         {
                             orderId = userServis.AddOrder(order);
-                            EditAnswer(context, botClient, $"created order, id - {orderId}");
-                            SendAnswer(context, botClient, ShowAllProducts() + "\n " +
-                                "enter id product");
                             orderProduct.OrderId = orderId;
+                            listProducts = $"order id: {orderId} \n" + ShowAllProducts();
+                            
+                            //EditAnswer(context, botClient, listProducts +"\n ENTYER PRODUCT ID"); 
                         }
                         catch
                         {
-                            Console.WriteLine("ERROR db");
-                            EditAnswer(context, botClient, "error db");
+                            EditAnswer(context, botClient, "error added in db");
                             UserProcessing.UpdateAdninToAddOrderState();
-                            UserProcessing.userCurrent.BotActionContext(update, botClient);
+                            UserProcessing.UserCurrent.BotActionContext(update, botClient);
                             handleAnswerNumber = "0";
                         }
+                        
                     }
                     else 
                     {
                         EditAnswer(context, botClient, "redirect to admin menu");
                         UserProcessing.UpdateAdninToStartAdminState();
-                        UserProcessing.userCurrent.BotActionContext(update, botClient);
+                        UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                        handleAnswerNumber = "0";
+                    }
+                    handleAnswerNumber = "2";
+                    UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                    break;
+
+                case "2":
+                    IsCallback(context, botClient, update);
+                    if (update.CallbackQuery.Data == "no")
+                    {
+                        //EditAnswer(context, botClient, "");
+                        UserProcessing.UpdateAdninToStartAdminState();
+                        UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                        handleAnswerNumber = "0";
+                    }
+                    else 
+                    {
+                        CurrentMessageId = update.CallbackQuery.Message.MessageId;
+                        EditAnswer(context, botClient, listProducts + "\n" + "ENTYER PRODUCT ID");
+                        handleAnswerNumber = "3";
+                    }
+                    break;
+
+                case "3":
+                    orderProduct.ProductId = Convert.ToInt32(update.Message.Text);
+                    EditAnswer(context, botClient, listProducts+"\n"+"ENTER COUNT");
+                    handleAnswerNumber = "4";
+                break;
+
+                case "4":
+                    orderProduct.Count = Convert.ToInt32(update.Message.Text);
+                    try
+                    {
+                        userServis.AddOrderProduct(orderProduct);
+                        SendAnswerWithButton(context, botClient, "add more", keyboardIs);
+                    }
+                    catch
+                    {
+                        EditAnswer(context, botClient, "error adding product in db");
+                        UserProcessing.UpdateAdninToStartAdminState();
+                        UserProcessing.UserCurrent.BotActionContext(update, botClient);
                         handleAnswerNumber = "0";
                     }
                     handleAnswerNumber = "2";
                     break;
 
-                case "2":
-                    
-                    orderProduct.ProductId = Convert.ToInt32(update.Message.Text);
-                    SendAnswer(context, botClient, "inter count");
-                    handleAnswerNumber = "3";
-                    break;
-
-                case "3":
-                    orderProduct.Count = Convert.ToInt32(update.Message.Text);
-                    userServis.AddOrderProduct(orderProduct);
-                    break;
-
              
                 default:
-                        SendAnswer(context, botClient, "error filing object");
-                        handleAnswerNumber = "1";
-                        break;
-
-                }
-            
-            //else
-            //{
-            //    HandleAnswer(update, botClient, "the message is not correct");
-            //    HandleAnswerNumber = "1";
-            //}
+                    EditAnswer(context, botClient, "error creat product");
+                    UserProcessing.UpdateAdninToStartAdminState();
+                    UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                    handleAnswerNumber = "0";
+                break;
+            }
         }
+
         public async void SendAnswer(
             Context context, ITelegramBotClient botClient, string text)
         {
@@ -115,13 +137,31 @@ namespace BotForShop.Bot.state
                 context.ChatId, $"{text}");
         }
 
-        public async void EditAnswer(Context context,
-            ITelegramBotClient botClient, string text)
+        public async void SendAnswerWithButton(
+            Context context, ITelegramBotClient botClient, 
+                string text, InlineKeyboardMarkup keyboard)
+        {
+            var Message = await botClient.SendTextMessageAsync(
+                context.ChatId, $"{text}", replyMarkup: keyboard);
+        }
+
+        public async void EditAnswer(
+            Context context, ITelegramBotClient botClient, string text)
         {
             await botClient.EditMessageTextAsync(
-                context.ChatId, currentMessageId,
+                context.ChatId, CurrentMessageId,
                 text);
         }
+
+        public async void EditAnswerWithButton(
+            Context context, ITelegramBotClient botClient, string text,
+            InlineKeyboardMarkup keyboard)
+        {
+            await botClient.EditMessageTextAsync(
+                context.ChatId, CurrentMessageId,
+                text, replyMarkup: keyboard);
+        }
+        
         public string ShowAllProducts()
         {
             UserService userService = new UserService();
@@ -151,6 +191,18 @@ namespace BotForShop.Bot.state
         );
 
 
+        public async void IsCallback(
+            Context context, ITelegramBotClient botClient, Update update)
+        {
+            if (update.Type == UpdateType.Message)
+            {
+                await botClient.EditMessageTextAsync(
+                context.ChatId, CurrentMessageId,
+                "ERROR, button press expected");
+                UserProcessing.UpdateAdninToStartAdminState();
+                UserProcessing.UserCurrent.BotActionContext(update, botClient);
+            }
+        }
     }
 
 

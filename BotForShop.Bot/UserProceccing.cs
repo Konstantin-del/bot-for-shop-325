@@ -5,20 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace BotForShop.Bot
 {
     public static class UserProcessing
     {
-        public static Dictionary<long, Context> Users { get; set; } = new Dictionary<long, Context>();
+        public static Dictionary<long, Context> Users { get; set; }  
 
-        public static Context userCurrent { get; set; } = new Context();
+        public static Context UserCurrent { get; set; } 
 
         public static void GetValuesForAuthentication()
         {
+            Users = new Dictionary<long, Context>();
             try
             {
+                var pepols = new Dictionary<long, Context>();
                 var userServis = new UserService();
                 var usersFromDB = userServis.GetUsersForAuthentication();
                 foreach (var item in usersFromDB)
@@ -26,7 +29,7 @@ namespace BotForShop.Bot
                     var userCurrent = new Context();
                     userCurrent.ChatId = item.ChatId;
                     userCurrent.RoleId = item.RoleId;
-                    userCurrent.Name = item.UserName.ToLower();
+                    userCurrent.Name = item.UserName.ToLower().TrimEnd();
                     userCurrent.Id = item.Id;
 
                     if (userCurrent.RoleId == 1)
@@ -45,78 +48,73 @@ namespace BotForShop.Bot
                     {
                         userCurrent.State = new StartMenuState();
                     }
-                    Users.Add(userCurrent.ChatId, userCurrent);
-                    Console.WriteLine(userCurrent.RoleId);
-                    Console.WriteLine(userCurrent.Name);
-                    Console.WriteLine(userCurrent.Id);
+                    pepols.Add(userCurrent.ChatId, userCurrent);
                 }
+                Users = pepols;
             }
             catch
             {
-                Console.WriteLine("users not loaded from db");
+                Console.WriteLine("users could not be loaded from the db");
             }
         }
 
         public static void UpdateCurrentUserIfMessage(Update update)
         {
             var message = update.Message;
+            UserCurrent = new Context();
 
             if (Users.ContainsKey(message.Chat.Id))
             {
-                userCurrent = Users[message.Chat.Id];
+                UserCurrent = Users[message.Chat.Id];
             }
             else
             {
-                //userCurrent = new Context();
-                userCurrent.Name = message.Chat.FirstName.ToLower();
-                userCurrent.ChatId = message.Chat.Id;
-                Users.Add(message.Chat.Id, userCurrent);
-                userCurrent.State = new StartMenuState();
+                UserCurrent.Name = message.Chat.FirstName.ToLower();
+                UserCurrent.ChatId = message.Chat.Id;
+                Users.Add(message.Chat.Id, UserCurrent);
+                UserCurrent.State = new StartMenuState();
             }
         }
 
         public static void UpdateCurrentUserIfCallback(Update update)
         {
             var callback = update.CallbackQuery;
+            UserCurrent = new Context();
 
             if (Users.ContainsKey(callback.From.Id))
             {
-                userCurrent = Users[callback.From.Id];
+                UserCurrent = Users[callback.From.Id];
             }
             else
             {
-                //userCurrent = new Context();
-                userCurrent.Name = callback.From.FirstName.ToLower();
-                userCurrent.ChatId = callback.From.Id;
-                Users.Add(callback.From.Id, userCurrent);
-                userCurrent.State = new StartMenuState();
+                UserCurrent.Name = callback.From.FirstName.ToLower();
+                UserCurrent.ChatId = callback.From.Id;
+                Users.Add(callback.From.Id, UserCurrent);
+                UserCurrent.State = new StartMenuState();
             }
         }
 
         public static void UpdateAdninToStartAdminState()
         {
-            userCurrent.State = new StartMenuAdminState();
+            UserCurrent.State = new StartMenuAdminState();
         }
 
         public static void UpdateAdninToAddUserState() 
         {
-            bool isAdmin = userCurrent.RoleId == 3 || userCurrent.RoleId == 325;
+            bool isAdmin = UserCurrent.RoleId == 3 || UserCurrent.RoleId == 325;
             if (isAdmin)
             {
-                userCurrent.State = new AddUserState();
+                UserCurrent.State = new AddUserState();
             }   
             else
             {
-
-                userCurrent.State = new StartMenuState();
+                UserCurrent.State = new StartMenuState();
             }
         }
 
         public static void UpdateAdninToAddOrderState()
         {
-            //await botClient.EditMessageTextAsync(new ChatId(context.ChatId),
-               // update.CallbackQuery.Message.MessageId, update.CallbackQuery.Message.Text);
-            userCurrent.State = new AddOrderState();
+            UserCurrent.State = new AddOrderState();
         }
 
         public static long GetChatIdByName(string name)

@@ -65,17 +65,16 @@ namespace BotForShop.Bot
 
                 if (update.CallbackQuery.Data == "3")
                 {
-                    UserProcessing.userCurrent.State = new StartMenuAdminState();
+                    UserProcessing.UserCurrent.State = new StartMenuAdminState();
                 }
             }
 
-            UserProcessing.userCurrent.BotActionContext(update, botClient);
+            UserProcessing.UserCurrent.BotActionContext(update, botClient);
         }
 
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             Console.WriteLine(exception.ToString());
         }
-  
     }
 }
