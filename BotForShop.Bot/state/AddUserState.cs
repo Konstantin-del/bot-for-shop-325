@@ -23,12 +23,7 @@ namespace BotForShop.Bot.state
 
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            
-            //if(HandleAnswerNumber != "0" && HandleAnswerNumber != "1")
-            //{
-            //    value = update.Message.Text;
-            //    isString = string.IsNullOrEmpty(value);
-            //}
+
 
             if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery.Data == "end")
             {
@@ -78,7 +73,7 @@ namespace BotForShop.Bot.state
                             break;
 
                         case "2":
-                            var chatId = 6655;// UserProcessing.GetChatIdByName(value); //here value is name  
+                            var chatId = UserProcessing.GetChatIdByName(value); //here value is name  
                             if (chatId != 0) // add check it user in db 
                             {
                                 User.ChatId = chatId;

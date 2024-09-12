@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace BotForShop.Core.OutputModels
 {
-    public class OrderOutputModel
+    public class OrderWithProductListOutputModel
     {
         public int Id { get; set; }
 
-        public List<ProductOutputModel> Products { get; set; }
+        public List<OrderProductOutputModel> Products { get; set; }
     }
 }

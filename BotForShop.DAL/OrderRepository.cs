@@ -62,41 +62,30 @@ namespace BotForShop.DAL
             }
         }
 
-        public List<OrderDto> GetAllOrderWithProduct()
+        public OrderDto GetOrderWithProduct(int id)
         {
             string conectionString = Options.ConectionString;
             using (var connection = new NpgsqlConnection(conectionString))
             {
-                string query = OrderQueries.GetAllOrderWithProductQuery;
+                string query = OrderQueries.GetOrderWithProductQuery;
+                var args = new { id = id };
 
                 connection.Open();
-                var result = new List<OrderDto>();
+                var result = new OrderDto();
 
-                connection.Query<OrderDto, ProductDto, OrderDto>(query,
+                connection.Query<OrderDto, ProductDto, OrderDto>(query, 
                     (order, product) =>
                     {
-                        int i = 0;
-                        bool isFouded = false;
-                        foreach (var u in result)
+                        
+                        if(result.Id != order.Id)
                         {
-                            if (u.Id == order.Id)
-                            {
-                                isFouded = true;
-                                break;
-                            }
-                            i++;
-                        }
-
-                        OrderDto crtnOrder;
-                        if (isFouded)
-                        {
-                            crtnOrder = result[i];
+                            result = order;
+                            result.Products = new List<ProductDto>();
+                            result.Products.Add(product);
                         }
                         else
                         {
-                            crtnOrder = order;
-                            crtnOrder.Products = new List<ProductDto>();
-                            result.Add(crtnOrder);
+                            result.Products.Add(product);
                         }
 
                         if (product is null)
@@ -104,13 +93,46 @@ namespace BotForShop.DAL
                             return order;
                         }
 
-                        crtnOrder.Products.Add(product);
-
                         return order;
-                    }, splitOn: "Id");
+                    }, args);// splitOn: "Id"
 
                 return result;
             }
         }
     }
 }
+
+//{
+//    int i = 0;
+//    bool isFouded = false;
+//    foreach (var item in result)
+//    {
+//        if (item.Id == order.Id)
+//        {
+//            isFouded = true;
+//            break;
+//        }
+//        i++;
+//    }
+
+//    OrderDto crtnOrder;
+//    if (isFouded)
+//    {
+//        crtnOrder = result[i];
+//    }
+//    else
+//    {
+//        crtnOrder = order;
+//        crtnOrder.Products = new List<ProductDto>();
+//        result.Add(crtnOrder);
+//    }
+
+//    if (product is null)
+//    {
+//        return order;
+//    }
+
+//    crtnOrder.Products.Add(product);
+
+//    return order;
+//}, args);//, splitOn: "Id"

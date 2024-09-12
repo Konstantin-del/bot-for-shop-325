@@ -99,6 +99,11 @@ namespace BotForShop.Bot
             UserCurrent.State = new StartMenuAdminState();
         }
 
+        public static void UpdateAdninToAddedOrderState()
+        {
+            UserCurrent.State = new AddedOrderAdminState();
+        }
+
         public static void UpdateAdninToAddUserState() 
         {
             bool isAdmin = UserCurrent.RoleId == 3 || UserCurrent.RoleId == 325;

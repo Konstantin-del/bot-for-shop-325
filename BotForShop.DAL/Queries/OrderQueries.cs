@@ -22,12 +22,13 @@ namespace BotForShop.DAL.Queries
             $" JOIN \"Products\"  ON \"Products\".\"Id\" = \"OrderProducts\".\"ProductId\" " +
             $" WHERE \"Orders\".\"Id\" = (@id);";
 
-        public const string GetAllOrderWithProductQuery =
-            $" SELECT \"Orders\".\"Id\", \"Products\".\"Id\", \"Products\".\"ProductName\"" +
-            $" FROM \"Orders\"" +
-            $" JOIN \"OrderProducts\"" +
-            $" ON \"Orders\".\"Id\" = \"OrderProducts\".\"OrderId\"" +
-            $" JOIN \"Products\"" +
-            $" ON \"Products\".\"Id\" = \"OrderProducts\".\"ProductId\";";
+        public const string GetOrderWithProductQuery =
+            $" SELECT o.\"Id\", p.\"Id\", p.\"ProductName\", op.\"Count\"" +
+            $" FROM \"Orders\" as o" +
+            $" JOIN \"OrderProducts\" as op" +
+            $" ON o.\"Id\" = op.\"OrderId\"" +
+            $" JOIN \"Products\" as p" +
+            $" ON p.\"Id\" = op.\"ProductId\"" +
+            $" WHERE o.\"Id\" = (@id);";
     }
 }

@@ -24,7 +24,7 @@ namespace BotForShop.Bot.state
 
         Update value;
 
-        int orderId;
+        public static int OrderId { get; set; }
 
         string listProducts;
 
@@ -54,9 +54,9 @@ namespace BotForShop.Bot.state
                         order.AdminId = context.Id;
                         try
                         {
-                            orderId = userServis.AddOrder(order);
-                            orderProduct.OrderId = orderId;
-                            listProducts = $"order id: {orderId} \n" + ShowAllProducts();
+                            OrderId = userServis.AddOrder(order);
+                            orderProduct.OrderId = OrderId;
+                            listProducts = $"order id: {OrderId} \n" + ShowAllProducts();
                             
                             //EditAnswer(context, botClient, listProducts +"\n ENTYER PRODUCT ID"); 
                         }
@@ -84,8 +84,7 @@ namespace BotForShop.Bot.state
                     IsCallback(context, botClient, update);
                     if (update.CallbackQuery.Data == "no")
                     {
-                        //EditAnswer(context, botClient, "");
-                        UserProcessing.UpdateAdninToStartAdminState();
+                        UserProcessing.UpdateAdninToAddedOrderState();
                         UserProcessing.UserCurrent.BotActionContext(update, botClient);
                         handleAnswerNumber = "0";
                     }
@@ -133,7 +132,7 @@ namespace BotForShop.Bot.state
         public async void SendAnswer(
             Context context, ITelegramBotClient botClient, string text)
         {
-            var Message = await botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 context.ChatId, $"{text}");
         }
 
@@ -141,7 +140,7 @@ namespace BotForShop.Bot.state
             Context context, ITelegramBotClient botClient, 
                 string text, InlineKeyboardMarkup keyboard)
         {
-            var Message = await botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 context.ChatId, $"{text}", replyMarkup: keyboard);
         }
 

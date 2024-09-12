@@ -15,7 +15,9 @@ namespace BotForShop.Bot.state
     {
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
-            if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery.Data != "end")
+            if (update.Type == UpdateType.CallbackQuery && 
+                update.CallbackQuery.Data != "end" &&
+                update.CallbackQuery.Data != "send")
             {
                 //context.keyboard = keyboard;
                 await botClient.EditMessageTextAsync(
