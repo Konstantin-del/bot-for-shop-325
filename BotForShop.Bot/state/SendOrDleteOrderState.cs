@@ -11,11 +11,14 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BotForShop.Bot.state
 {
-    public class AddedOrderAdminState: AbstractState
+    public class SendOrDleteOrderState: AbstractState
     {
-        bool isFirst = true;
-        string products = "";
+        
+        public static string CurrentProducts = "";
+
         string result = "";
+        bool isFirst = true;
+
         public override async void BotAction(Context context, Update update, ITelegramBotClient botClient)
         {
            
@@ -28,14 +31,13 @@ namespace BotForShop.Bot.state
 
                     foreach (var item in res.Products)
                     {
-                        products += $" {item.Id} {item.ProductName.TrimEnd()} {item.Count} \n";
+                        CurrentProducts += $"{item.ProductName.TrimEnd()}, count: {item.Count} \n";
                     }
-                    result = $"{res.Id} \n{products}";
+                    result = $"order id: {res.Id}\n{CurrentProducts}";
 
                     await botClient.EditMessageTextAsync(
                     context.ChatId, update.CallbackQuery.Message.MessageId,
                     result, replyMarkup: keyboardSend);
-                    
                 }
                 catch
                 {
@@ -51,14 +53,18 @@ namespace BotForShop.Bot.state
             {
                 if(update.CallbackQuery.Data == "send")
                 {
-                    //try 
-                    //{
+                    try 
+                    {
                         foreach (var item in UserProcessing.Users)
                         {
                             if (item.Value.RoleId == 2)
                             {
-                                await botClient.SendTextMessageAsync(
-                                    item.Value.ChatId, products, replyMarkup: keyboardTake);
+                                var idMessage = await botClient.SendTextMessageAsync(
+                                    item.Value.ChatId, CurrentProducts, replyMarkup: keyboardTake);
+
+                                item.Value.LastMessageId = idMessage.MessageId;
+                                Console.WriteLine(idMessage.MessageId);
+                                item.Value.State = new ManagerGetMessagState();
                             }
                         }
                         await botClient.EditMessageTextAsync(
@@ -66,14 +72,14 @@ namespace BotForShop.Bot.state
                             "the order has been \n send to the menedger");
                         UserProcessing.UpdateAdninToStartAdminState();
                         UserProcessing.UserCurrent.BotActionContext(update, botClient);
-                    //} 
-                    //catch
-                    //{
-                    //    await botClient.EditMessageTextAsync(
-                    //        context.ChatId, update.CallbackQuery.Message.MessageId, "error send order");
-                    //    UserProcessing.UpdateAdninToStartAdminState();
-                    //    UserProcessing.UserCurrent.BotActionContext(update, botClient);
-                    //}
+                    } 
+                    catch
+                    {
+                        await botClient.EditMessageTextAsync(
+                            context.ChatId, update.CallbackQuery.Message.MessageId, "error send order");
+                        UserProcessing.UpdateAdninToStartAdminState();
+                        UserProcessing.UserCurrent.BotActionContext(update, botClient);
+                    }
                 }
 
                 //попробовать снова или выйти

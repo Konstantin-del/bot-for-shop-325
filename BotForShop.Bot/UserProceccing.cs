@@ -101,7 +101,7 @@ namespace BotForShop.Bot
 
         public static void UpdateAdninToAddedOrderState()
         {
-            UserCurrent.State = new AddedOrderAdminState();
+            UserCurrent.State = new SendOrDleteOrderState();
         }
 
         public static void UpdateAdninToAddUserState() 

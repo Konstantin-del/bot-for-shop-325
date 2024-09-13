@@ -12,7 +12,7 @@ namespace BotForShop.Bot
 
         public string? Name { get; set; }
 
-        public string? NicName { get; set; }
+        public int LastMessageId { get; set; }
 
         public int? RoleId { get; set; }
 
