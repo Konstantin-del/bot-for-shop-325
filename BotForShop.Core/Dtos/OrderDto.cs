@@ -22,6 +22,10 @@ namespace BotForShop.Core.Dtos
 
         public int? Count { get; set; }
 
+        public int? ShopId { get; set; }
+
+        public int? StatusId { get; set; }
+
         public List<ProductDto>? Products { get; set; }
     }
 }

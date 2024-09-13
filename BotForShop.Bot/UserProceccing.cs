@@ -31,6 +31,7 @@ namespace BotForShop.Bot
                     userCurrent.RoleId = item.RoleId;
                     userCurrent.Name = item.UserName.ToLower().TrimEnd();
                     userCurrent.Id = item.Id;
+                    userCurrent.ShopId = item.ShopId;
 
                     if (userCurrent.RoleId == 1)
                     {

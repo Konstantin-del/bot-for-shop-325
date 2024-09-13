@@ -8,13 +8,19 @@ using Telegram.Bot;
 using BotForShop.BLL;
 using Telegram.Bot.Types.ReplyMarkups;
 using static System.Net.Mime.MediaTypeNames;
+using BotForShop.Core.OutputModels;
+using BotForShop.Core;
 
 namespace BotForShop.Bot.state
 {
     public class SendOrDleteOrderState: AbstractState
     {
         
-        public static string CurrentProducts = "";
+        public static string CurrentProducts { get; set; } = "";
+
+        public static int CurrentOrderId { get; set; }
+
+        public OrderContext OrderContext { get; set; } 
 
         string result = "";
         bool isFirst = true;
@@ -28,12 +34,16 @@ namespace BotForShop.Bot.state
                 {
                     var orderServis = new OrderServise();
                     var res = orderServis.GetOrderWithProduct(AddOrderState.OrderId);
-
+                    CurrentOrderId = res.Id;
                     foreach (var item in res.Products)
                     {
                         CurrentProducts += $"{item.ProductName.TrimEnd()}, count: {item.Count} \n";
                     }
                     result = $"order id: {res.Id}\n{CurrentProducts}";
+
+                    OrderContext = new OrderContext();
+                    OrderContext.Order = result;                  
+                    OrderContext.OrderId = res.Id;
 
                     await botClient.EditMessageTextAsync(
                     context.ChatId, update.CallbackQuery.Message.MessageId,
@@ -53,6 +63,7 @@ namespace BotForShop.Bot.state
             {
                 if(update.CallbackQuery.Data == "send")
                 {
+                    ModelForMailing modelForMailing; 
                     try 
                     {
                         foreach (var item in UserProcessing.Users)
@@ -61,10 +72,15 @@ namespace BotForShop.Bot.state
                             {
                                 var idMessage = await botClient.SendTextMessageAsync(
                                     item.Value.ChatId, CurrentProducts, replyMarkup: keyboardTake);
-
+                                 
                                 item.Value.LastMessageId = idMessage.MessageId;
-                                Console.WriteLine(idMessage.MessageId);
-                                item.Value.State = new ManagerGetMessagState();
+                                item.Value.State = new ManagerTakeOrderState();
+
+                                modelForMailing = new ModelForMailing();
+                                modelForMailing.MessageId = idMessage.MessageId;
+                                modelForMailing.ChatId = item.Value.ChatId;
+                                Console.WriteLine(modelForMailing.ChatId);
+                                OrderContext.ForSend.Add(modelForMailing);
                             }
                         }
                         await botClient.EditMessageTextAsync(
@@ -72,6 +88,8 @@ namespace BotForShop.Bot.state
                             "the order has been \n send to the menedger");
                         UserProcessing.UpdateAdninToStartAdminState();
                         UserProcessing.UserCurrent.BotActionContext(update, botClient);
+
+                        OrderProceccing.Orders.Add(OrderContext);
                     } 
                     catch
                     {

@@ -10,13 +10,15 @@ namespace BotForShop.Bot
     {
         public long ChatId { get; set; }
 
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         public int LastMessageId { get; set; }
 
-        public int? RoleId { get; set; }
+        public int RoleId { get; set; }
 
         public int Id { get; set; }
+
+        public int ShopId { get; set; }
 
         public InlineKeyboardMarkup? keyboard { get; set; }
 

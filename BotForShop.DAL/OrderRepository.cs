@@ -99,6 +99,34 @@ namespace BotForShop.DAL
                 return result;
             }
         }
+
+        public void UpdateStatusOrder(int orderId, int statusId)
+        {
+            Console.WriteLine(statusId);
+            string conectionString = Options.ConectionString;
+            using (var connection = new NpgsqlConnection(conectionString))
+            {
+                var query = OrderQueries.UpdateStatusOrder;
+                var args = new { orderId = orderId, statusId = statusId };
+
+                connection.Open();
+                connection.Query<OrderDto>(query, args);
+            }
+        }
+
+        public void AddShopIdInOrder(int orderId, int shopId)
+        {
+            string conectionString = Options.ConectionString;
+            using (var connection = new NpgsqlConnection(conectionString))
+            {
+                var query = OrderQueries.AddShopIdInOrder;
+                var args = new { orderId = orderId, shopId = shopId };
+
+                connection.Open();
+                connection.Query<OrderDto>(query, args);
+            }
+        }
+
     }
 }
 

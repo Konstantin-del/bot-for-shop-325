@@ -11,6 +11,8 @@ namespace BotForShop.BLL.Mappings
         {
             CreateMap<OrderDto, OrderOutputModel>();
             CreateMap<OrderInputModel, OrderDto>();
+            //CreateMap<UpdateStatusInOrderInputModel, OrderDto>();
+
         }
 
     }

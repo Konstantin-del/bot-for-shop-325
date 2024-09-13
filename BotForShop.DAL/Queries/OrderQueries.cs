@@ -30,5 +30,13 @@ namespace BotForShop.DAL.Queries
             $" JOIN \"Products\" as p" +
             $" ON p.\"Id\" = op.\"ProductId\"" +
             $" WHERE o.\"Id\" = (@id);";
+
+        public const string UpdateStatusOrder = 
+            $"UPDATE \"Orders\" SET \"StatusId\" = (@statusId) WHERE \"Id\"=(@orderId) ";
+
+        public const string AddShopIdInOrder =
+            $"UPDATE \"Orders\" SET \"ShopId\" = (@shopId) WHERE \"Id\"=(@orderId) ";
+
+
     }
 }

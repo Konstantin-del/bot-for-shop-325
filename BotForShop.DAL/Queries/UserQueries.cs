@@ -25,7 +25,7 @@ namespace BotForShop.DAL.Queries
             $" left join \"Product\" as P on P.\"Id\"=OP.\"ProductId\"";
 
         public const string GetUserForAuthenticationQuery =
-            $"SELECT u.\"Id\", u.\"UserName\", u.\"ChatId\", u.\"RoleId\"" +
+            $"SELECT u.\"Id\", u.\"UserName\", u.\"ChatId\", u.\"RoleId\", u.\"ShopId\"" +
             $" FROM \"Users\" as u "; 
 
         public const string GetUserRoleQuery = $"SELECT * FROM \"UserRoles\"";
