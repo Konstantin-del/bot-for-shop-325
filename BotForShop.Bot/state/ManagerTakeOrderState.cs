@@ -21,27 +21,44 @@ namespace BotForShop.Bot.state
 
             if (update.CallbackQuery.Data == "take")
             {
+                //foreach (var item in OrderProceccing.Orders)
+                //{
+                //    Console.WriteLine("here");
+                //}
 
-                foreach (var item in UserProcessing.Users)
+                foreach (var item in OrderProceccing.Orders)
                 {
-                    if (item.Value.RoleId == 2)
+                    foreach (var mesId in item.ForSend)
                     {
-                        if (item.Value.ChatId != context.ChatId)
+                        Console.WriteLine(mesId.MessageId);
+                        Console.WriteLine(mesId.ChatId);
+
+                        if (mesId.MessageId == idMessage)
                         {
-                            await botClient.EditMessageTextAsync(
-                                item.Value.ChatId, item.Value.LastMessageId, "the order was taken");
-                        }
-                        else
-                        {
-                            await botClient.EditMessageTextAsync(
-                                item.Value.ChatId, item.Value.LastMessageId,
-                                SendOrDleteOrderState.CurrentProducts, replyMarkup: keyboardNext);
-                            item.Value.State = new ManagerCollectedOrderState();
+                            orderContext.LastMessag = idMessage;
+                            orderContext = item;
+                            break; // add enter up
                         }
                     }
                 }
 
-                context.State = new ManagerCollectedOrderState();
+                foreach (var item in orderContext.ForSend)
+                {
+                    if (idMessage != item.MessageId)
+                    {
+                        await botClient.EditMessageTextAsync(
+                                item.ChatId, item.MessageId, "the order was taken");
+                    }
+                    else
+                    {
+                        await botClient.EditMessageTextAsync(
+                            item.ChatId, item.MessageId,
+                            SendOrDleteOrderState.CurrentProducts, replyMarkup: keyboardNext);
+                    }
+
+                }
+
+                //context.State = new ManagerCollectedOrderState();
                 int orderId = orderContext.OrderId;
                 var orderRepository = new OrderRepository();
                 orderRepository.UpdateStatusOrder(orderId, 2);
@@ -60,40 +77,25 @@ namespace BotForShop.Bot.state
 
 
 
-//foreach (var item in OrderProceccing.Orders)
+
+
+
+
+//foreach (var item in UserProcessing.Users)
 //{
-//    Console.WriteLine("here");
-//}
-
-
-
-//foreach (var item in OrderProceccing.Orders)
-//{
-//    foreach (var mesId in item.ForSend)
+//    if (item.Value.RoleId == 2)
 //    {
-//        Console.WriteLine(mesId.MessageId);
-//        Console.WriteLine(mesId.ChatId);
-
-//        if (mesId.MessageId == idMessage)
+//        if (item.Value.ChatId != context.ChatId)
 //        {
-//            orderContext.LastMessag = idMessage;
-//            orderContext = item;
+//            await botClient.EditMessageTextAsync(
+//                item.Value.ChatId, item.Value.LastMessageId, "the order was taken");
+//        }
+//        else
+//        {
+//            await botClient.EditMessageTextAsync(
+//                item.Value.ChatId, item.Value.LastMessageId,
+//                SendOrDleteOrderState.CurrentProducts, replyMarkup: keyboardNext);
+//            item.Value.State = new ManagerCollectedOrderState();
 //        }
 //    }
-//}
-
-//foreach (var item in orderContext.ForSend)
-//{
-//    if (idMessage != item.MessageId)
-//    {
-//        await botClient.EditMessageTextAsync(
-//                item.ChatId, item.MessageId, "the order was taken");
-//    }
-//    else
-//    {
-//        await botClient.EditMessageTextAsync(
-//            item.ChatId, item.MessageId,
-//            SendOrDleteOrderState.CurrentProducts, replyMarkup: keyboardNext);
-//    }
-
 //}

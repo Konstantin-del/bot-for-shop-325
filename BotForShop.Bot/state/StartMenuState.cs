@@ -30,7 +30,8 @@ namespace BotForShop.Bot.state
             }
             else 
             {
-                await botClient.SendTextMessageAsync(update.Message.Chat, startText);
+                Console.WriteLine("unhandled exception");
+                //await botClient.SendTextMessageAsync(update.Message.Chat, startText);
             }
         }
 

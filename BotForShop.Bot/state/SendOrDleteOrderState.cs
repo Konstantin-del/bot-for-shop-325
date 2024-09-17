@@ -63,8 +63,9 @@ namespace BotForShop.Bot.state
             {
                 if(update.CallbackQuery.Data == "send")
                 {
-                    ModelForMailing modelForMailing; 
-                    try 
+                    ModelForMailing modelForMailing;
+                    OrderContext.ForSend = new List<ModelForMailing>();
+                    try
                     {
                         foreach (var item in UserProcessing.Users)
                         {
@@ -78,8 +79,7 @@ namespace BotForShop.Bot.state
 
                                 modelForMailing = new ModelForMailing();
                                 modelForMailing.MessageId = idMessage.MessageId;
-                                modelForMailing.ChatId = item.Value.ChatId;
-                                Console.WriteLine(modelForMailing.ChatId);
+                                modelForMailing.ChatId = item.Value.ChatId;                               
                                 OrderContext.ForSend.Add(modelForMailing);
                             }
                         }
@@ -88,7 +88,6 @@ namespace BotForShop.Bot.state
                             "the order has been \n send to the menedger");
                         UserProcessing.UpdateAdninToStartAdminState();
                         UserProcessing.UserCurrent.BotActionContext(update, botClient);
-
                         OrderProceccing.Orders.Add(OrderContext);
                     } 
                     catch

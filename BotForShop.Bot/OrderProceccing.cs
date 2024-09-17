@@ -8,6 +8,6 @@ namespace BotForShop.Bot
 {
     public static class OrderProceccing
     {
-        public static List<OrderContext> Orders { get; set; }
+        public static List<OrderContext> Orders { get; set; } = new List<OrderContext>();
     }
 }
